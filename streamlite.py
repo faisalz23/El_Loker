@@ -6,13 +6,14 @@ import seaborn as sns
 from wordcloud import WordCloud
 import nltk
 import re
+import os
 
 # Download stopwords (hanya perlu sekali)
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 # Setup koneksi MongoDB
-client = MongoClient('mongodb://localhost:27017/')
+client = MongoClient('mongodb+srv://eL_loker:elloker123@bigdata.fukimpx.mongodb.net/?retryWrites=true&w=majority&appName=BigData')
 db = client['jobstreet2']
 collection = db['job']
 
