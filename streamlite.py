@@ -3,7 +3,6 @@ import pandas as pd
 from pymongo import MongoClient
 import matplotlib.pyplot as plt
 import seaborn as sns
-from wordcloud import WordCloud
 import nltk
 import re
 import os
@@ -89,26 +88,6 @@ try:
     except Exception as e:
         st.error(f"Error creating job type visualization: {str(e)}")
         logger.error(f"Job type visualization error: {str(e)}")
-
-    # WordCloud: dari Judul Lowongan
-    try:
-        st.subheader(f"☁️ WordCloud Judul Lowongan: {selected_category}")
-        text = ' '.join(filtered_df['title'].dropna().tolist())
-        text = re.sub(r'[^a-zA-Z\s]', '', text)
-
-        # Gabungkan stopwords Indonesia dan Inggris
-        stop_words = set(stopwords.words('indonesian')) | set(stopwords.words('english'))
-
-        wordcloud = WordCloud(width=800, height=400, background_color='white',
-                          stopwords=stop_words, colormap='viridis').generate(text)
-
-        fig_wc, ax_wc = plt.subplots(figsize=(10, 5))
-        ax_wc.imshow(wordcloud, interpolation='bilinear')
-        ax_wc.axis('off')
-        st.pyplot(fig_wc)
-    except Exception as e:
-        st.error(f"Error creating wordcloud: {str(e)}")
-        logger.error(f"WordCloud error: {str(e)}")
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
