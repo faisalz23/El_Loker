@@ -7,6 +7,8 @@ import nltk
 import re
 import os
 import logging
+from wordcloud import WordCloud
+from collections import Counter
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -88,6 +90,47 @@ try:
     except Exception as e:
         st.error(f"Error creating job type visualization: {str(e)}")
         logger.error(f"Job type visualization error: {str(e)}")
+
+    # Visualisasi: Word Cloud untuk judul pekerjaan
+    try:
+        st.subheader("☁️ Word Cloud Judul Pekerjaan")
+        
+        # Menggabungkan semua judul pekerjaan
+        all_titles = ' '.join(filtered_df['title'].fillna('').astype(str))
+        
+        # Membersihkan teks
+        def clean_text(text):
+            # Menghapus karakter khusus dan angka
+            text = re.sub(r'[^\w\s]', '', text)
+            text = re.sub(r'\d+', '', text)
+            # Mengubah ke lowercase
+            text = text.lower()
+            return text
+        
+        # Membersihkan teks
+        cleaned_text = clean_text(all_titles)
+        
+        # Menghapus stopwords
+        stop_words = set(stopwords.words('english'))
+        words = cleaned_text.split()
+        filtered_words = [word for word in words if word not in stop_words and len(word) > 2]
+        
+        # Membuat word cloud
+        wordcloud = WordCloud(width=800, height=400, 
+                            background_color='white',
+                            max_words=100,
+                            contour_width=3,
+                            contour_color='steelblue').generate(' '.join(filtered_words))
+        
+        # Menampilkan word cloud
+        fig3, ax3 = plt.subplots(figsize=(10, 5))
+        ax3.imshow(wordcloud, interpolation='bilinear')
+        ax3.axis('off')
+        st.pyplot(fig3)
+        
+    except Exception as e:
+        st.error(f"Error creating word cloud: {str(e)}")
+        logger.error(f"Word cloud error: {str(e)}")
 
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
