@@ -33,4 +33,9 @@ ENV/
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Sensitive files
+.streamlit/secrets.toml
+.env
+*.env 
