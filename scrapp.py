@@ -1,13 +1,11 @@
-from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
 from pymongo import MongoClient
 import logging
 import time
+import os
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -22,17 +20,23 @@ def scrape_jobstreet(category):
         db = client['jobstreet2']
         collection = db['job']
         
+        # Hapus data lama jika ini adalah kategori pertama
+        if category == 'software-engineer':  # Kategori pertama dalam list
+            logger.info("Deleting existing data...")
+            collection.delete_many({})
+            logger.info("Existing data deleted successfully")
+        
         # Setup Chrome options
-        chrome_options = Options()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--window-size=1920,1080')
-        chrome_options.add_argument('--disable-notifications')
+        options = uc.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument('--disable-notifications')
         
         # Initialize the Chrome WebDriver
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        driver = uc.Chrome(options=options)
         logger.info("WebDriver initialized")
         
         # JobStreet Indonesia search URL for the specified category
@@ -95,7 +99,7 @@ def scrape_jobstreet(category):
                             title = card.find_element(By.CSS_SELECTOR, 'a[data-automation="jobTitle"]').text.strip()
                         except:
                             title = "Not specified"
-                    
+                
                 try:    
                     company = card.find_element(By.CSS_SELECTOR, 'a[data-automation="jobCompany"]').text.strip()
                 except:
@@ -103,7 +107,7 @@ def scrape_jobstreet(category):
                         company = card.find_element(By.CSS_SELECTOR, '[data-automation="company-name"]').text.strip()
                     except:
                         company = "Not specified"
-                    
+                
                 try:
                     location = card.find_element(By.CSS_SELECTOR, 'a[data-automation="jobLocation"]').text.strip()
                 except:
@@ -111,7 +115,7 @@ def scrape_jobstreet(category):
                         location = card.find_element(By.CSS_SELECTOR, '[data-automation="job-location"]').text.strip()
                     except:
                         location = "Not specified"
-                    
+                
                 try:
                     salary = card.find_element(By.CSS_SELECTOR, 'span[data-automation="jobSalary"]').text.strip()
                 except:
@@ -119,7 +123,7 @@ def scrape_jobstreet(category):
                         salary = card.find_element(By.CSS_SELECTOR, '[data-automation="job-salary"]').text.strip()
                     except:
                         salary = "Not specified"
-                    
+                
                 try:
                     job_type = card.find_element(By.CSS_SELECTOR, 'span[data-automation="jobType"]').text.strip()
                 except:
@@ -127,7 +131,7 @@ def scrape_jobstreet(category):
                         job_type = card.find_element(By.CSS_SELECTOR, '[data-automation="job-type"]').text.strip()
                     except:
                         job_type = "Not specified"
-                    
+                
                 try:
                     posted_date = card.find_element(By.CSS_SELECTOR, 'span[data-automation="jobListingDate"]').text.strip()
                 except:
